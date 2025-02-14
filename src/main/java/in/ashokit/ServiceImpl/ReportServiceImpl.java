@@ -1,8 +1,12 @@
 package in.ashokit.ServiceImpl;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
@@ -11,6 +15,8 @@ import in.ashokit.entity.CitizenPlan;
 import in.ashokit.repo.CitizenPlanRepository;
 import in.ashokit.request.SearchRequest;
 import in.ashokit.service.ReportService;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class ReportServiceImpl implements ReportService{
@@ -57,8 +63,43 @@ public class ReportServiceImpl implements ReportService{
 	}
 
 	@Override
-	public boolean exportExcel() {
-		return false;
+	public boolean exportExcel(HttpServletResponse response) throws Exception {
+		Workbook workBook = new HSSFWorkbook();
+		org.apache.poi.ss.usermodel.Sheet sheet = workBook.createSheet("plans-data");
+		Row headerRow = sheet.createRow(0);
+		headerRow.createCell(0).setCellValue("ID");
+		headerRow.createCell(0).setCellValue("Citizen Name");
+		headerRow.createCell(0).setCellValue("Plan Name");
+		headerRow.createCell(0).setCellValue("Plan Status");
+		headerRow.createCell(0).setCellValue("Plan StartDate");
+		headerRow.createCell(0).setCellValue("Plan EndDate");
+		headerRow.createCell(0).setCellValue("Benefit Amt");
+		
+		List<CitizenPlan> records = planRepo.findAll();
+		
+		int dataRowIndex =1;
+		
+		for(CitizenPlan plan : records) {
+			Row dataRow = sheet.createRow(dataRowIndex);
+			dataRow.createCell(0).setCellValue(plan.getCitizenID());
+			dataRow.createCell(1).setCellValue(plan.getCitizenName());
+			dataRow.createCell(2).setCellValue(plan.getPlanName());
+			dataRow.createCell(3).setCellValue(plan.getPlanStatus());
+			dataRow.createCell(4).setCellValue(plan.getPlanStartDate());
+			dataRow.createCell(5).setCellValue(plan.getPlanEndDate());
+			dataRow.createCell(6).setCellValue(plan.getBenefitAmt());
+			
+			dataRowIndex++;
+		}
+		try {
+			ServletOutputStream outputStream = response.getOutputStream();
+			workBook.write(outputStream);
+			outputStream.close();
+		}catch(IOException ioe) {
+			ioe.getMessage();
+		}
+	
+		return true;
 	}
 
 	@Override
