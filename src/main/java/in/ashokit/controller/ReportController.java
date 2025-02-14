@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import in.ashokit.entity.CitizenPlan;
 import in.ashokit.request.SearchRequest;
 import in.ashokit.service.ReportService;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 public class ReportController {
@@ -37,6 +38,13 @@ public class ReportController {
 		return "index";
 	}
 	
+	
+	@GetMapping("/excel")
+	public void exportExcel(HttpServletResponse response) throws Exception {
+		response.setContentType("application/octct-stream");
+		response.addHeader("Content-Disposition", "attachement;filename=plans.xls");
+		reportService.exportExcel(response);
+	}
 	
 	@GetMapping("/")
 	public String indexPage(Model model) {
