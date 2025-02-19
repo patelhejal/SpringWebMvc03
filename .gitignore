@@ -1,0 +1,20 @@
+# Ignore target directory (Maven build output)
+target/
+
+# Ignore compiled Java files
+*.class
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+
+# Ignore IntelliJ IDEA and Eclipse project files
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# Ignore environment files
+.env
+
